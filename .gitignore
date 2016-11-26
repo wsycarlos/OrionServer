@@ -1,0 +1,8 @@
+*.suo
+*.sln
+Library
+Temp
+Holo
+UWP
+*.csproj
+.vs
