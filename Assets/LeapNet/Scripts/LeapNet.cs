@@ -8,6 +8,8 @@ namespace LeapNet
     {
         public TextMesh debug;
 
+        //public GameObject player;
+
         void Start()
         {
             StartServer();
@@ -23,6 +25,13 @@ namespace LeapNet
         {
             Debug.Log("Client Disconnect!");
             debug.gameObject.SetActive(false);
+        }
+
+        public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
+        {
+            GameObject player = (GameObject)Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+
+            NetworkServer.AddPlayerForConnection(conn, player, playerControllerId);
         }
     }
 }

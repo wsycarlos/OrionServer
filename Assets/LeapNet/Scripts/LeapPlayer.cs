@@ -5,6 +5,12 @@ using System.Collections.Generic;
 
 public class LeapPlayer : NetworkBehaviour
 {
+    public void Start()
+    {
+        Debug.Log("Leap Player Start");
+        Debug.Log(transform.position);
+    }
+
     public float delay = 0.1f;
 
     public LeapHand leftHand;

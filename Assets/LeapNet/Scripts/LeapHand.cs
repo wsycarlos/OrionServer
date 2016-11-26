@@ -163,8 +163,8 @@ public class LeapHand : MonoBehaviour
     public void BeginHand()
     {
         isTracked = true;
-        transform.position = handPos.position;
-        transform.rotation = handPos.rotation;
+        //transform.position = handPos.position;
+        //transform.rotation = handPos.rotation;
 
         Debug.Log(handPos.position);
 
