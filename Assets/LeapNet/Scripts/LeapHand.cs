@@ -163,11 +163,9 @@ public class LeapHand : MonoBehaviour
     public void BeginHand()
     {
         isTracked = true;
-        //transform.position = handPos.position;
-        //transform.rotation = handPos.rotation;
-
-        Debug.Log(handPos.position);
-
+        transform.position = handPos.position;
+        transform.rotation = handPos.rotation;
+        
         if (hand_.IsLeft)
         {
             jointMat.color = _leftColorList[_leftColorIndex];
@@ -182,8 +180,6 @@ public class LeapHand : MonoBehaviour
     
     public void UpdateHand()
     {
-        Debug.Log("Update Hand");
-
         //Update the spheres first
         updateSpheres();
 

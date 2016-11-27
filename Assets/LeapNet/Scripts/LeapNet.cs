@@ -6,26 +6,20 @@ namespace LeapNet
 {
     public class LeapNet : NetworkManager
     {
-        public TextMesh debug;
-
-        //public GameObject player;
-
         void Start()
         {
             StartServer();
         }
 
-        public override void OnServerConnect(NetworkConnection conn)
-        {
-            debug.gameObject.SetActive(true);
-            Debug.Log("Client Connect!");
-        }
+        //public override void OnServerConnect(NetworkConnection conn)
+        //{
+        //    Debug.Log("Client Connect!");
+        //}
         
-        public override void OnServerDisconnect(NetworkConnection conn)
-        {
-            Debug.Log("Client Disconnect!");
-            debug.gameObject.SetActive(false);
-        }
+        //public override void OnServerDisconnect(NetworkConnection conn)
+        //{
+        //    Debug.Log("Client Disconnect!");
+        //}
 
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
         {
