@@ -3,51 +3,34 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
 
+[NetworkSettings(sendInterval = 0.01f)]
 public class LeapPlayer : NetworkBehaviour
 {
     public void Start()
     {
         Debug.Log("Leap Player Start");
-        Debug.Log(transform.position);
+        Application.targetFrameRate = 100;
     }
-
-    public float delay = 0.1f;
 
     public LeapHand leftHand;
     public LeapHand rightHand;
 
-    private float leftLastTime = -1f;
-    private float rightLastTime = -1f;
-
-    public void FinishHand(int hand)
-    {
-        Debug.Log("Finish Hand:" + hand);
-
-        CmdFinishHand(hand);
-    }
-
-    public void SetLeapHand(int hand, byte[] arrHand)
-    {
-        Debug.Log("Set Hand:" + hand + " with "+ arrHand.Length);
-        if (hand ==0)
-        {
-            if (leftLastTime + delay < Time.realtimeSinceStartup)
-            {
-                CmdSetLeapHand(hand, arrHand);
-                leftLastTime = Time.realtimeSinceStartup;
-            }
-        }
-        else if(hand == 1)
-        {
-            if (rightLastTime + delay < Time.realtimeSinceStartup)
-            {
-                CmdSetLeapHand(hand, arrHand);
-                rightLastTime = Time.realtimeSinceStartup;
-            }
-        }
-    }
+    public LeapAudio leapAudio;
     
-    [Command]
+    [Command(channel = 0)]
+    public void CmdBeginHand(int hand, byte[] arrHand)
+    {
+        if (hand == 0)
+        {
+            leftHand.BeginHand(arrHand);
+        }
+        else
+        {
+            rightHand.BeginHand(arrHand);
+        }
+    }
+
+    [Command(channel = 0)]
     public void CmdFinishHand(int hand)
     {
         if (hand == 0)
@@ -60,9 +43,9 @@ public class LeapPlayer : NetworkBehaviour
         }
     }
 
-    [Command]
+    [Command(channel = 1)]
     public void CmdSetLeapHand(int hand, byte[] arrHand)
-    {        
+    {
         if (hand == 0)
         {
             leftHand.SetLeapHand(arrHand);
@@ -73,4 +56,9 @@ public class LeapPlayer : NetworkBehaviour
         }
     }
 
+    [Command(channel = 2)]
+    public void CmdAudioSend(float[] f, int chan)
+    {
+        leapAudio.Set(f, chan);
+    }
 }

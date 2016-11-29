@@ -92,21 +92,19 @@ public class LeapHand : MonoBehaviour
     {
         return hand_;
     }
-    
+
+    public void BeginHand(byte[] arrHand)
+    {
+        hand_ = LeapHandData.Deserialize(arrHand);
+        InitHand();
+        BeginHand();
+        UpdateHand();
+    }
+
     public void SetLeapHand(byte[] arrHand)
     {
-        if (hand_ == null)
-        {
-            hand_ = LeapHandData.Deserialize(arrHand);
-            InitHand();
-            BeginHand();
-            UpdateHand();
-        }
-        else
-        {
-            hand_ = LeapHandData.Deserialize(arrHand);
-            UpdateHand();
-        }
+        hand_ = LeapHandData.Deserialize(arrHand);
+        UpdateHand();
     }
 
     void OnValidate()
