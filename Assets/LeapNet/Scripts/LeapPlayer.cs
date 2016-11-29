@@ -9,7 +9,6 @@ public class LeapPlayer : NetworkBehaviour
     public void Start()
     {
         Debug.Log("Leap Player Start");
-        Application.targetFrameRate = 100;
     }
 
     public LeapHand leftHand;

@@ -92,9 +92,21 @@ public class LeapHand : MonoBehaviour
     {
         return hand_;
     }
+    
+    public bool Enable
+    {
+        set
+        {
+            foreach(Transform _t in transform)
+            {
+                _t.gameObject.SetActive(value);
+            }
+        }
+    }
 
     public void BeginHand(byte[] arrHand)
     {
+        Enable = true;
         hand_ = LeapHandData.Deserialize(arrHand);
         InitHand();
         BeginHand();
@@ -124,7 +136,7 @@ public class LeapHand : MonoBehaviour
         if (_material != null)
         {
             jointMat = new Material(_material);
-            jointMat.hideFlags = HideFlags.DontSaveInEditor;
+            //jointMat.hideFlags = HideFlags.DontSaveInEditor;
         }
 
         if (_serializedTransforms != null)
@@ -195,6 +207,7 @@ public class LeapHand : MonoBehaviour
     {
         isTracked = false;
         hand_ = null;
+        Enable = false;
     }
 
     //Transform updating methods
@@ -252,7 +265,7 @@ public class LeapHand : MonoBehaviour
             Transform sphereA = _sphereATransforms[i];
             Transform sphereB = _sphereBTransforms[i];
 
-            Vector3 delta = sphereA.localPosition - sphereB.localPosition;
+            Vector3 delta = sphereA.position - sphereB.position;
 
             if (!_hasGeneratedMeshes)
             {
@@ -367,7 +380,7 @@ public class LeapHand : MonoBehaviour
         sphere.transform.parent = transform;
         sphere.transform.localScale = Vector3.one * radius * 2;
 
-        sphere.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+        //sphere.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
         sphere.layer = gameObject.layer;
 
         if (isPartOfArm)
@@ -392,7 +405,7 @@ public class LeapHand : MonoBehaviour
         _sphereBTransforms.Add(jointB);
 
         cylinder.gameObject.layer = gameObject.layer;
-        cylinder.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
+        //cylinder.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
 
         if (isPartOfArm)
         {
@@ -404,7 +417,7 @@ public class LeapHand : MonoBehaviour
     {
         Mesh mesh = new Mesh();
         mesh.name = "GeneratedCylinder";
-        mesh.hideFlags = HideFlags.DontSave;
+        //mesh.hideFlags = HideFlags.DontSave;
 
         List<Vector3> verts = new List<Vector3>();
         List<Color> colors = new List<Color>();
