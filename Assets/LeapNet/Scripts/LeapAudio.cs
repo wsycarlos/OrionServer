@@ -8,7 +8,7 @@ public class LeapAudio : MonoBehaviour
 
     void Start()
     {
-        source = GetComponent<AudioSource>();
+        source = Camera.main.GetComponent<AudioSource>();
     }
 
     public void Set(float[] f, int chan)
