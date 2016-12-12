@@ -19,13 +19,14 @@ public class LeapPlayer : NetworkBehaviour
     [Command(channel = 0)]
     public void CmdBeginHand(int hand, byte[] arrHand)
     {
+        byte[] newHand = CLZF.Decompress(arrHand);
         if (hand == 0)
         {
-            leftHand.BeginHand(arrHand);
+            leftHand.BeginHand(newHand);
         }
         else
         {
-            rightHand.BeginHand(arrHand);
+            rightHand.BeginHand(newHand);
         }
     }
 
@@ -45,13 +46,14 @@ public class LeapPlayer : NetworkBehaviour
     [Command(channel = 1)]
     public void CmdSetLeapHand(int hand, byte[] arrHand)
     {
+        byte[] newHand = CLZF.Decompress(arrHand);
         if (hand == 0)
         {
-            leftHand.SetLeapHand(arrHand);
+            leftHand.SetLeapHand(newHand);
         }
         else
         {
-            rightHand.SetLeapHand(arrHand);
+            rightHand.SetLeapHand(newHand);
         }
     }
 
