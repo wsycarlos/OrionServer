@@ -35,9 +35,6 @@ public class LeapHand : MonoBehaviour
     private Chirality handedness;
 
     [SerializeField]
-    private bool _showArm = true;
-
-    [SerializeField]
     private Material _material;
 
     [SerializeField]
@@ -58,12 +55,11 @@ public class LeapHand : MonoBehaviour
 
     private Transform wristPositionSphere;
 
-    private List<Renderer> _armRenderers;
+    //private List<Renderer> _armRenderers;
     private List<Transform> _cylinderTransforms;
     private List<Transform> _sphereATransforms;
     private List<Transform> _sphereBTransforms;
-
-    private Transform armFrontLeft, armFrontRight, armBackLeft, armBackRight;
+    
     private NetHand hand_;
 
     public ModelType HandModelType
@@ -97,10 +93,10 @@ public class LeapHand : MonoBehaviour
     {
         set
         {
-            foreach(Transform _t in transform)
-            {
-                _t.gameObject.SetActive(value);
-            }
+            //foreach(Transform _t in transform)
+            //{
+            //    _t.gameObject.SetActive(value);
+            //}
         }
     }
 
@@ -123,12 +119,6 @@ public class LeapHand : MonoBehaviour
     {
         //Resolution must be at least 3!
         _cylinderResolution = Mathf.Max(3, _cylinderResolution);
-
-        //Update visibility on validate so that the user can toggle in real-time
-        if (_armRenderers != null)
-        {
-            updateArmVisibility();
-        }
     }
 
     public void InitHand()
@@ -157,15 +147,13 @@ public class LeapHand : MonoBehaviour
         }
 
         _jointSpheres = new Transform[4 * 5];
-        _armRenderers = new List<Renderer>();
+        //_armRenderers = new List<Renderer>();
         _cylinderTransforms = new List<Transform>();
         _sphereATransforms = new List<Transform>();
         _sphereBTransforms = new List<Transform>();
 
         createSpheres();
         createCylinders();
-
-        updateArmVisibility();
 
         _hasGeneratedMeshes = false;
     }
@@ -192,12 +180,6 @@ public class LeapHand : MonoBehaviour
     {
         //Update the spheres first
         updateSpheres();
-
-        //Update Arm only if we need to
-        if (_showArm)
-        {
-            updateArm();
-        }
 
         //The cylinder transforms are deterimined by the spheres they are connected to
         updateCylinders();
@@ -238,25 +220,9 @@ public class LeapHand : MonoBehaviour
         Transform thumbBase = _jointSpheres[THUMB_BASE_INDEX];
 
         Vector3 thumbBaseToPalm = thumbBase.localPosition - hand_.PalmPosition.ToVector3();
-        mockThumbJointSphere.localPosition = hand_.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, hand_.Basis.xBasis.ToVector3());
+        mockThumbJointSphere.localPosition = hand_.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, hand_.XBasis.ToVector3());
     }
-
-    private void updateArm()
-    {
-        var arm = hand_.Arm;
-        Vector3 right = arm.Basis.xBasis.ToVector3() * arm.Width * 0.7f * 0.5f;
-        Vector3 wrist = arm.WristPosition.ToVector3();
-        Vector3 elbow = arm.ElbowPosition.ToVector3();
-
-        float armLength = Vector3.Distance(wrist, elbow);
-        wrist -= arm.Direction.ToVector3() * armLength * 0.05f;
-
-        armFrontRight.localPosition = wrist + right;
-        armFrontLeft.localPosition = wrist - right;
-        armBackRight.localPosition = elbow + right;
-        armBackLeft.localPosition = elbow - right;
-    }
-
+    
     private void updateCylinders()
     {
         for (int i = 0; i < _cylinderTransforms.Count; i++)
@@ -286,15 +252,7 @@ public class LeapHand : MonoBehaviour
 
         _hasGeneratedMeshes = true;
     }
-
-    private void updateArmVisibility()
-    {
-        for (int i = 0; i < _armRenderers.Count; i++)
-        {
-            _armRenderers[i].enabled = _showArm;
-        }
-    }
-
+    
     //Geometry creation methods
 
     private void createSpheres()
@@ -317,11 +275,6 @@ public class LeapHand : MonoBehaviour
         mockThumbJointSphere = createSphere("MockJoint", SPHERE_RADIUS);
         palmPositionSphere = createSphere("PalmPosition", PALM_RADIUS);
         wristPositionSphere = createSphere("WristPosition", SPHERE_RADIUS);
-
-        armFrontLeft = createSphere("ArmFrontLeft", SPHERE_RADIUS, true);
-        armFrontRight = createSphere("ArmFrontRight", SPHERE_RADIUS, true);
-        armBackLeft = createSphere("ArmBackLeft", SPHERE_RADIUS, true);
-        armBackRight = createSphere("ArmBackRight", SPHERE_RADIUS, true);
     }
 
     private void createCylinders()
@@ -358,11 +311,6 @@ public class LeapHand : MonoBehaviour
         Transform pinkyBase = _jointSpheres[PINKY_BASE_INDEX];
         createCylinder("Hand Bottom", thumbBase, mockThumbJointSphere);
         createCylinder("Hand Side", pinkyBase, mockThumbJointSphere);
-
-        createCylinder("ArmFront", armFrontLeft, armFrontRight, true);
-        createCylinder("ArmBack", armBackLeft, armBackRight, true);
-        createCylinder("ArmLeft", armFrontLeft, armBackLeft, true);
-        createCylinder("ArmRight", armFrontRight, armBackRight, true);
     }
 
     private int getFingerJointIndex(int fingerIndex, int jointIndex)
@@ -370,7 +318,7 @@ public class LeapHand : MonoBehaviour
         return fingerIndex * 4 + jointIndex;
     }
 
-    private Transform createSphere(string name, float radius, bool isPartOfArm = false)
+    private Transform createSphere(string name, float radius)
     {
         GameObject sphere = new GameObject(name);
         _serializedTransforms.Add(sphere.transform);
@@ -383,15 +331,10 @@ public class LeapHand : MonoBehaviour
         //sphere.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
         sphere.layer = gameObject.layer;
 
-        if (isPartOfArm)
-        {
-            _armRenderers.Add(sphere.GetComponent<Renderer>());
-        }
-
         return sphere.transform;
     }
 
-    private void createCylinder(string name, Transform jointA, Transform jointB, bool isPartOfArm = false)
+    private void createCylinder(string name, Transform jointA, Transform jointB)
     {
         GameObject cylinder = new GameObject(name);
         _serializedTransforms.Add(cylinder.transform);
@@ -406,11 +349,6 @@ public class LeapHand : MonoBehaviour
 
         cylinder.gameObject.layer = gameObject.layer;
         //cylinder.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.HideInInspector;
-
-        if (isPartOfArm)
-        {
-            _armRenderers.Add(cylinder.GetComponent<Renderer>());
-        }
     }
 
     private Mesh generateCylinderMesh(float length)
