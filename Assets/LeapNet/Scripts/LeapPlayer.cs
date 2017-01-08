@@ -58,8 +58,9 @@ public class LeapPlayer : NetworkBehaviour
     }
 
     [Command(channel = 2)]
-    public void CmdAudioSend(float[] f, int chan)
+    public void CmdAudioSend(byte[] f, int chan)
     {
-        leapAudio.Set(f, chan);
+        float[] newAudio = CLZF.DecompressAudio(f);
+        leapAudio.Set(newAudio, chan);
     }
 }

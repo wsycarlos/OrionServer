@@ -4,7 +4,7 @@ using System.Collections;
 public class LeapAudio : MonoBehaviour
 {
     AudioSource source;
-    private const int FREQUENCY = 11025;
+    private const int FREQUENCY = 22050;
 
     void Start()
     {
