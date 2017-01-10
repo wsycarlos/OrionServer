@@ -21,14 +21,14 @@ public class LeapPlayer : NetworkBehaviour
     {
         try
         {
-            byte[] newHand = CLZF.Decompress(arrHand);
+            //byte[] newHand = CLZF.Decompress(arrHand);
             if (hand == 0)
             {
-                leftHand.BeginHand(newHand);
+                leftHand.BeginHand(arrHand);
             }
             else
             {
-                rightHand.BeginHand(newHand);
+                rightHand.BeginHand(arrHand);
             }
         }
         catch (System.Exception e)
@@ -62,14 +62,14 @@ public class LeapPlayer : NetworkBehaviour
     {
         try
         {
-            byte[] newHand = CLZF.Decompress(arrHand);
+            //byte[] newHand = CLZF.Decompress(arrHand);
             if (hand == 0)
             {
-                leftHand.SetLeapHand(newHand);
+                leftHand.SetLeapHand(arrHand);
             }
             else
             {
-                rightHand.SetLeapHand(newHand);
+                rightHand.SetLeapHand(arrHand);
             }
         }
         catch (System.Exception e)
@@ -78,13 +78,35 @@ public class LeapPlayer : NetworkBehaviour
         }
     }
 
+    private bool receiving = false;
+    private byte[] received = null;
     [Command(channel = 2)]
     public void CmdAudioSend(byte[] f, int chan)
     {
         try
         {
-            float[] newAudio = CLZF.DecompressAudio(f);
-            leapAudio.Set(newAudio, chan);
+            if (chan > 0 && !receiving)
+            {
+                receiving = true;
+                Debug.Log(f.Length);
+                //received = CLZF.Decompress(f);
+                received = f;
+            }
+            else if (chan > 0 && receiving)
+            {
+                Debug.Log(f.Length);
+                //var newBytes = CLZF.Decompress(f);
+                byte[] tmp = received;
+                received = new byte[tmp.Length + f.Length];
+                System.Buffer.BlockCopy(tmp, 0, received, 0, tmp.Length);
+                System.Buffer.BlockCopy(f, 0, received, tmp.Length, f.Length);
+            }
+            else if (chan < 0 && receiving)
+            {
+                receiving = false;
+                Debug.Log("Final Length:" + received.Length);
+                leapAudio.Set(CLZF.ToFloatArray(received));
+            }
         }
         catch (System.Exception e)
         {

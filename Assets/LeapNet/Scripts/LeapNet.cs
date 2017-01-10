@@ -11,15 +11,16 @@ namespace LeapNet
             StartServer();
         }
 
-        //public override void OnServerConnect(NetworkConnection conn)
-        //{
-        //    Debug.Log("Client Connect!");
-        //}
-        
-        //public override void OnServerDisconnect(NetworkConnection conn)
-        //{
-        //    Debug.Log("Client Disconnect!");
-        //}
+        public override void OnServerConnect(NetworkConnection conn)
+        {
+            conn.SetChannelOption(2, ChannelOption.MaxPendingBuffers, 128);
+            Debug.Log("Client Connect!");
+        }
+
+        public override void OnServerDisconnect(NetworkConnection conn)
+        {
+            Debug.Log("Client Disconnect!");
+        }
 
         public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId)
         {

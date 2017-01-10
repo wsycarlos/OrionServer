@@ -1,71 +1,25 @@
 ﻿using System;
+using System.Linq;
 
 public static class CLZF
 {
-    private static readonly uint HLOG = 14;
-    private static readonly uint HSIZE = (1 << 14);
-    private static readonly uint MAX_LIT = (1 << 5);
-    private static readonly uint MAX_OFF = (1 << 13);
-    private static readonly uint MAX_REF = ((1 << 8) + (1 << 3));
+    //public static byte[] Compress(byte[] inputArray)
+    //{
+    //    int size = inputArray.Length;
+    //    byte[] output = new byte[size + 1];
+    //    int actualSize = Compress(inputArray, size, output, size + 1);
+    //    return output.Take(actualSize).ToArray();
+    //}
 
-    /// <summary>
-    /// Hashtable, that can be allocated only once
-    /// </summary>
-    private static readonly long[] HashTable = new long[HSIZE];
+    //public static byte[] Decompress(byte[] inputArray)
+    //{
+    //    int size = inputArray.Length;
+    //    byte[] output = new byte[65535];
+    //    int actualSize = Decompress(inputArray, size, output, 65535);
+    //    return output.Take(actualSize).ToArray();
+    //}
 
-    // Compresses inputBytes
-    public static byte[] Compress(byte[] inputBytes)
-    {
-        // Starting guess, increase it later if needed
-        int outputByteCountGuess = inputBytes.Length * 2;
-        byte[] tempBuffer = new byte[outputByteCountGuess];
-        int byteCount = lzf_compress(inputBytes, ref tempBuffer);
-
-        // If byteCount is 0, then increase buffer and try again
-        while (byteCount == 0)
-        {
-            outputByteCountGuess *= 2;
-            tempBuffer = new byte[outputByteCountGuess];
-            byteCount = lzf_compress(inputBytes, ref tempBuffer);
-        }
-
-        byte[] outputBytes = new byte[byteCount];
-        Buffer.BlockCopy(tempBuffer, 0, outputBytes, 0, byteCount);
-        return outputBytes;
-    }
-
-    // Decompress outputBytes
-    public static byte[] Decompress(byte[] inputBytes)
-    {
-        // Starting guess, increase it later if needed
-        int outputByteCountGuess = inputBytes.Length * 2;
-        byte[] tempBuffer = new byte[outputByteCountGuess];
-        int byteCount = lzf_decompress(inputBytes, ref tempBuffer);
-
-        // If byteCount is 0, then increase buffer and try again
-        while (byteCount == 0)
-        {
-            outputByteCountGuess *= 2;
-            tempBuffer = new byte[outputByteCountGuess];
-            byteCount = lzf_decompress(inputBytes, ref tempBuffer);
-        }
-
-        byte[] outputBytes = new byte[byteCount];
-        Buffer.BlockCopy(tempBuffer, 0, outputBytes, 0, byteCount);
-        return outputBytes;
-    }
-    
-    public static byte[] CompressAudio(float[] inputFloats)
-    {
-        return Compress(ToByteArray(inputFloats));
-    }
-
-    public static float[] DecompressAudio(byte[] inputBytes)
-    {
-        return ToFloatArray(Decompress(inputBytes));
-    }
-
-    private static byte[] ToByteArray(float[] floatArray)
+    public static byte[] ToByteArray(float[] floatArray)
     {
         int len = floatArray.Length * 4;
         byte[] byteArray = new byte[len];
@@ -79,7 +33,7 @@ public static class CLZF
         return byteArray;
     }
 
-    private static float[] ToFloatArray(byte[] byteArray)
+    public static float[] ToFloatArray(byte[] byteArray)
     {
         int len = byteArray.Length / 4;
         float[] floatArray = new float[len];
@@ -91,16 +45,26 @@ public static class CLZF
     }
 
     /// <summary>
+    /// Hashtable, thac can be allocated only once
+    /// </summary>
+    private static readonly long[] HashTable = new long[HSIZE];
+
+    private const uint HLOG = 14;
+    private const uint HSIZE = (1 << 14);
+    private const uint MAX_LIT = (1 << 5);
+    private const uint MAX_OFF = (1 << 13);
+    private const uint MAX_REF = ((1 << 8) + (1 << 3));
+
+    /// <summary>
     /// Compresses the data using LibLZF algorithm
     /// </summary>
     /// <param name="input">Reference to the data to compress</param>
+    /// <param name="inputLength">Lenght of the data to compress</param>
     /// <param name="output">Reference to a buffer which will contain the compressed data</param>
+    /// <param name="outputLength">Lenght of the compression buffer (should be bigger than the input buffer)</param>
     /// <returns>The size of the compressed archive in the output buffer</returns>
-    private static int lzf_compress(byte[] input, ref byte[] output)
+    public static int Compress(byte[] input, int inputLength, byte[] output, int outputLength)
     {
-        int inputLength = input.Length;
-        int outputLength = output.Length;
-
         Array.Clear(HashTable, 0, (int)HSIZE);
 
         long hslot;
@@ -123,12 +87,12 @@ public static class CLZF
 
 
                 if ((off = iidx - reference - 1) < MAX_OFF
-                       && iidx + 4 < inputLength
-                       && reference > 0
-                       && input[reference + 0] == input[iidx + 0]
-                       && input[reference + 1] == input[iidx + 1]
-                       && input[reference + 2] == input[iidx + 2]
-                        )
+                    && iidx + 4 < inputLength
+                    && reference > 0
+                    && input[reference + 0] == input[iidx + 0]
+                    && input[reference + 1] == input[iidx + 1]
+                    && input[reference + 2] == input[iidx + 2]
+                    )
                 {
                     /* match found at *reference++ */
                     uint len = 2;
@@ -219,13 +183,12 @@ public static class CLZF
     /// Decompresses the data using LibLZF algorithm
     /// </summary>
     /// <param name="input">Reference to the data to decompress</param>
+    /// <param name="inputLength">Lenght of the data to decompress</param>
     /// <param name="output">Reference to a buffer which will contain the decompressed data</param>
+    /// <param name="outputLength">The size of the decompressed archive in the output buffer</param>
     /// <returns>Returns decompressed size</returns>
-    private static int lzf_decompress(byte[] input, ref byte[] output)
+    public static int Decompress(byte[] input, int inputLength, byte[] output, int outputLength)
     {
-        int inputLength = input.Length;
-        int outputLength = output.Length;
-
         uint iidx = 0;
         uint oidx = 0;
 
