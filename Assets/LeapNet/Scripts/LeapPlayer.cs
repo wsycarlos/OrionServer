@@ -15,52 +15,80 @@ public class LeapPlayer : NetworkBehaviour
     public LeapHand rightHand;
 
     public LeapAudio leapAudio;
-    
+
     [Command(channel = 0)]
     public void CmdBeginHand(int hand, byte[] arrHand)
     {
-        byte[] newHand = CLZF.Decompress(arrHand);
-        if (hand == 0)
+        try
         {
-            leftHand.BeginHand(newHand);
+            byte[] newHand = CLZF.Decompress(arrHand);
+            if (hand == 0)
+            {
+                leftHand.BeginHand(newHand);
+            }
+            else
+            {
+                rightHand.BeginHand(newHand);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            rightHand.BeginHand(newHand);
+            Debug.LogException(e);
         }
     }
 
     [Command(channel = 0)]
     public void CmdFinishHand(int hand)
     {
-        if (hand == 0)
+        try
         {
-            leftHand.FinishHand();
+            if (hand == 0)
+            {
+                leftHand.FinishHand();
+            }
+            else
+            {
+                rightHand.FinishHand();
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            rightHand.FinishHand();
+            Debug.LogException(e);
         }
     }
 
     [Command(channel = 1)]
     public void CmdSetLeapHand(int hand, byte[] arrHand)
     {
-        byte[] newHand = CLZF.Decompress(arrHand);
-        if (hand == 0)
+        try
         {
-            leftHand.SetLeapHand(newHand);
+            byte[] newHand = CLZF.Decompress(arrHand);
+            if (hand == 0)
+            {
+                leftHand.SetLeapHand(newHand);
+            }
+            else
+            {
+                rightHand.SetLeapHand(newHand);
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            rightHand.SetLeapHand(newHand);
+            Debug.LogException(e);
         }
     }
 
     [Command(channel = 2)]
     public void CmdAudioSend(byte[] f, int chan)
     {
-        float[] newAudio = CLZF.DecompressAudio(f);
-        leapAudio.Set(newAudio, chan);
+        try
+        {
+            float[] newAudio = CLZF.DecompressAudio(f);
+            leapAudio.Set(newAudio, chan);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(e);
+        }
     }
 }

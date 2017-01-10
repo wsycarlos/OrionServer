@@ -93,10 +93,10 @@ public class LeapHand : MonoBehaviour
     {
         set
         {
-            //foreach(Transform _t in transform)
-            //{
-            //    _t.gameObject.SetActive(value);
-            //}
+            foreach (Transform _t in transform)
+            {
+                _t.gameObject.SetActive(value);
+            }
         }
     }
 
