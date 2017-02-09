@@ -2,6 +2,7 @@
 using System.Collections;
 using UnityEngine.Networking;
 using System.Collections.Generic;
+using System.IO;
 
 [NetworkSettings(sendInterval = 0.01f)]
 public class LeapPlayer : NetworkBehaviour
@@ -30,6 +31,19 @@ public class LeapPlayer : NetworkBehaviour
             {
                 rightHand.BeginHand(arrHand);
             }
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogException(e);
+        }
+    }
+
+    [Command(channel = 0)]
+    public void CmdGesture(int hand, int gesture)
+    {
+        try
+        {
+            Messenger.Broadcast<int>("Gesture_" + hand, gesture);
         }
         catch (System.Exception e)
         {
@@ -97,9 +111,11 @@ public class LeapPlayer : NetworkBehaviour
                 Debug.Log(f.Length);
                 //var newBytes = CLZF.Decompress(f);
                 byte[] tmp = received;
-                received = new byte[tmp.Length + f.Length];
-                System.Buffer.BlockCopy(tmp, 0, received, 0, tmp.Length);
-                System.Buffer.BlockCopy(f, 0, received, tmp.Length, f.Length);
+                int newSize = tmp.Length + f.Length;
+                var ms = new MemoryStream(new byte[newSize], 0, newSize, true, true);
+                ms.Write(tmp, 0, tmp.Length);
+                ms.Write(f, 0, f.Length);
+                received = ms.ToArray();
             }
             else if (chan < 0 && receiving)
             {

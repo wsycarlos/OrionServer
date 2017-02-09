@@ -47,6 +47,8 @@ public class NetHand
     public List<NetFinger> Fingers;
     public bool IsLeft;
     public NetVector PalmPosition;
+    public NetVector PalmNormal;
+    public NetVector Direction;
     public NetVector XBasis;
 
     public static void Write(BinaryWriter w, NetHand h)
@@ -65,6 +67,8 @@ public class NetHand
         }
         w.Write(h.IsLeft);
         NetVector.Write(w, h.PalmPosition);
+        NetVector.Write(w, h.PalmNormal);
+        NetVector.Write(w, h.Direction);
         NetVector.Write(w, h.XBasis);
     }
 
@@ -83,6 +87,8 @@ public class NetHand
         }
         h.IsLeft = r.ReadBoolean();
         h.PalmPosition = NetVector.Read(r);
+        h.PalmNormal = NetVector.Read(r);
+        h.Direction = NetVector.Read(r);
         h.XBasis = NetVector.Read(r);
 
         return h;

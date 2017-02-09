@@ -7,7 +7,7 @@ public class LeapHand : MonoBehaviour
     Transform handPos;
     void Awake()
     {
-        handPos = Camera.main.transform.GetChild(0);
+        handPos = GameObject.Find("StaticHandPos").transform;
     }
 
     public enum Chirality { Left, Right, Either };
@@ -206,8 +206,11 @@ public class LeapHand : MonoBehaviour
                 int key = getFingerJointIndex((int)finger.Type, j);
                 if (key >= 0)
                 {
-                    Transform sphere = _jointSpheres[key];
-                    sphere.localPosition = finger.Bone(j).NextJoint.ToVector3();
+                    if (_jointSpheres != null && _jointSpheres[key] != null)
+                    {
+                        Transform sphere = _jointSpheres[key];
+                        sphere.localPosition = finger.Bone(j).NextJoint.ToVector3();
+                    }
                 }
             }
         }
