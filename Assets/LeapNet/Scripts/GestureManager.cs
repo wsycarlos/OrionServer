@@ -56,7 +56,7 @@ public class GestureManager : MonoBehaviour
     public GameObject gestureModel2;
     public GameObject gestureModel3;
     public GameObject gestureModel4;
-
+    
     public void OnEnable()
     {
         Messenger.AddListener("EndGesture_" + handness, EndHand);

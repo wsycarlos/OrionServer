@@ -196,34 +196,36 @@ public class LeapHand : MonoBehaviour
 
     private void updateSpheres()
     {
-        //Update all spheres
-        List<NetFinger> fingers = hand_.Fingers;
-        for (int i = 0; i < fingers.Count; i++)
+        if (hand_ != null && hand_.PalmPosition != null)
         {
-            NetFinger finger = fingers[i];
-            for (int j = 0; j < 4; j++)
+            //Update all spheres
+            List<NetFinger> fingers = hand_.Fingers;
+            for (int i = 0; i < fingers.Count; i++)
             {
-                int key = getFingerJointIndex((int)finger.Type, j);
-                if (key >= 0)
+                NetFinger finger = fingers[i];
+                for (int j = 0; j < 4; j++)
                 {
-                    if (_jointSpheres != null && _jointSpheres[key] != null)
+                    int key = getFingerJointIndex((int)finger.Type, j);
+                    if (key >= 0)
                     {
-                        Transform sphere = _jointSpheres[key];
-                        sphere.localPosition = finger.Bone(j).NextJoint.ToVector3();
+                        if (_jointSpheres != null && _jointSpheres[key] != null)
+                        {
+                            Transform sphere = _jointSpheres[key];
+                            sphere.localPosition = finger.Bone(j).NextJoint.ToVector3();
+                        }
                     }
                 }
             }
+            palmPositionSphere.localPosition = hand_.PalmPosition.ToVector3();
+
+            Vector3 wristPos = hand_.PalmPosition.ToVector3();
+            wristPositionSphere.localPosition = wristPos;
+
+            Transform thumbBase = _jointSpheres[THUMB_BASE_INDEX];
+
+            Vector3 thumbBaseToPalm = thumbBase.localPosition - hand_.PalmPosition.ToVector3();
+            mockThumbJointSphere.localPosition = hand_.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, hand_.XBasis.ToVector3());
         }
-
-        palmPositionSphere.localPosition = hand_.PalmPosition.ToVector3();
-
-        Vector3 wristPos = hand_.PalmPosition.ToVector3();
-        wristPositionSphere.localPosition = wristPos;
-
-        Transform thumbBase = _jointSpheres[THUMB_BASE_INDEX];
-
-        Vector3 thumbBaseToPalm = thumbBase.localPosition - hand_.PalmPosition.ToVector3();
-        mockThumbJointSphere.localPosition = hand_.PalmPosition.ToVector3() + Vector3.Reflect(thumbBaseToPalm, hand_.XBasis.ToVector3());
     }
     
     private void updateCylinders()

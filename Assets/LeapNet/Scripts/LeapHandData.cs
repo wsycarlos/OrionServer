@@ -48,7 +48,7 @@ public class NetHand
     public bool IsLeft;
     public NetVector PalmPosition;
     public NetVector PalmNormal;
-    public NetVector Direction;
+    public NetQuaternion Rotation;
     public NetVector XBasis;
 
     public static void Write(BinaryWriter w, NetHand h)
@@ -68,7 +68,7 @@ public class NetHand
         w.Write(h.IsLeft);
         NetVector.Write(w, h.PalmPosition);
         NetVector.Write(w, h.PalmNormal);
-        NetVector.Write(w, h.Direction);
+        NetQuaternion.Write(w, h.Rotation);
         NetVector.Write(w, h.XBasis);
     }
 
@@ -88,7 +88,7 @@ public class NetHand
         h.IsLeft = r.ReadBoolean();
         h.PalmPosition = NetVector.Read(r);
         h.PalmNormal = NetVector.Read(r);
-        h.Direction = NetVector.Read(r);
+        h.Rotation = NetQuaternion.Read(r);
         h.XBasis = NetVector.Read(r);
 
         return h;
@@ -125,6 +125,47 @@ public class NetVector
     public Vector3 ToVector3()
     {
         return new Vector3(x, y, z);
+    }
+}
+
+public class NetQuaternion
+{
+    public float x;
+    public float y;
+    public float z;
+    public float w;
+
+    public static void Write(BinaryWriter w, NetQuaternion v)
+    {
+        w.Write(v.x);
+        w.Write(v.y);
+        w.Write(v.z);
+        w.Write(v.w);
+    }
+
+    public static NetQuaternion Read(BinaryReader r)
+    {
+        NetQuaternion v = new NetQuaternion();
+        v.x = r.ReadSingle();
+        v.y = r.ReadSingle();
+        v.z = r.ReadSingle();
+        v.w = r.ReadSingle();
+        return v;
+    }
+
+    public NetQuaternion() { }
+
+    public NetQuaternion(Quaternion v)
+    {
+        x = v.x;
+        y = v.y;
+        z = v.z;
+        w = v.w;
+    }
+
+    public Quaternion ToQuaternion()
+    {
+        return new Quaternion(x, y, z, w);
     }
 }
 
